@@ -98,10 +98,58 @@ def load_all(transformed_data: dict) -> None:
     logger.info("Proceso de carga completado")
 
 
+def get_snowflake_engine():
+    """
+    Crea la conexion a snowflake.
+    Los datos crudos van a schema RAW.
+    """
+
+    engine = create_engine(
+        "snowflake://{user}:{password}@{account}/{database}/{schema}?warehouse={warehouse}&role={role}".format(
+            user=os.getenv('SNOWFLAKE_USER'),
+            password=os.getenv('SNOWFLAKE_PASSWORD'),
+            account=os.getenv('SNOWFLAKE_ACCOUNT'),
+            database=os.getenv('SNOWFLAKE_DATABASE'),
+            schema=os.getenv('SNOWFLAKE_SCHEMA'),
+            warehouse=os.getenv('SNOWFLAKE_WAREHOUSE'),
+            role=os.getenv('SNOWFLAKE_ROLE')
+        )
+    )
+    logger.info("Conexión a Snowflake establecida")
+    return engine
+        
+    
+
+def load_to_snowflake(transformed_data: dict) -> None:
+    """
+    Carga los datos crudos al schema RAW de Snowflake.
+    En Snowflake se guardan los datos tal y como vienen, sin transformar.
+    dbt se encarga de las transformaciones despues.
+    """
+
+    logger.info("Cargando los datos a Snowflake RAW...")
+
+    engine = get_snowflake_engine()
+
+    load_dataframe(transformed_data['products'], 'raw_products', engine)
+    load_dataframe(transformed_data['users'], 'raw_users', engine)
+    load_dataframe(transformed_data['orders'], 'raw_orders', engine)
+
+    logger.info("Carga a Snowflake completada")
+
+
+
+
+
 if __name__ == "__main__":
     from extract import extract_all
     from transform import transform_all
 
     raw_data = extract_all()
     transformed_data = transform_all(raw_data)
+
+    # Carga a PostgreSQL en local
     load_all(transformed_data)
+
+    # Carga a Snowflake en la nube
+    load_to_snowflake(transformed_data)
