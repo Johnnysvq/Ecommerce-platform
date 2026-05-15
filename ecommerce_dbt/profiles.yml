@@ -1,0 +1,13 @@
+ecommerce_dbt:
+  outputs:
+    dev:
+      account: lbpqjpl-es58635
+      database: ecommerce_db
+      password: Tengounaequisd22.
+      role: sysadmin
+      schema: raw
+      threads: 4
+      type: snowflake
+      user: johnnysvq
+      warehouse: ecommerce_wh
+  target: dev

@@ -2,6 +2,7 @@ import requests
 import json
 import logging
 from datetime import datetime
+from typing import List, Dict
 
 # Configuracion de los logs - En produccion siemore se loggea todo
 
@@ -11,7 +12,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def extract_products() -> list[dict]:
+def extract_products() -> List[Dict]:
     """
     Extrae los productos de la API de Fake Store.
     Retorna una lista de diccionarios con los datos crudos.
@@ -30,7 +31,7 @@ def extract_products() -> list[dict]:
 
     return products
 
-def extract_users() -> list[dict]:
+def extract_users() -> List[Dict]:
     """
     Extrae los usuarios de la API de Fake Store.
     """
@@ -46,7 +47,7 @@ def extract_users() -> list[dict]:
     return users
 
 
-def extract_orders() -> list[dict]:
+def extract_orders() -> List[Dict]:
     """
     Extrae todas las ordenes (carts) de la Fake Store API.
     """
@@ -63,7 +64,7 @@ def extract_orders() -> list[dict]:
     return orders
 
 
-def extract_all() -> dict:
+def extract_all() -> Dict:
     """
     Funcion principal que extrae todas las entidades.
     Retorna un diccionario con todos los datos crudos.

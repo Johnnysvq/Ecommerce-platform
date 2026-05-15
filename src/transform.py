@@ -1,6 +1,7 @@
 import pandas as pd
 import logging
 from datetime import datetime
+from typing import List, Dict
 
 logging.basicConfig(
     level=logging.INFO,
@@ -9,7 +10,7 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-def transform_products(raw_products: list[dict]) -> pd.DataFrame:
+def transform_products(raw_products: List[Dict]) -> pd.DataFrame:
     """
     Transforma la lista cruda de productos en un DataFrame limpio.
     """
@@ -45,7 +46,7 @@ def transform_products(raw_products: list[dict]) -> pd.DataFrame:
     return df
 
 
-def transform_users(raw_users: list[dict]) -> pd.DataFrame:
+def transform_users(raw_users: List[Dict]) -> pd.DataFrame:
     """
     Transforma la lista cruda de usuarios en un DataFrame limpio.
     los usuarios tienen datos muy anidados, por lo que se deben extraer y normalizar
@@ -83,7 +84,7 @@ def transform_users(raw_users: list[dict]) -> pd.DataFrame:
     return df
 
 
-def transform_orders(raw_orders: list[dict]) -> pd.DataFrame:
+def transform_orders(raw_orders: List[Dict]) -> pd.DataFrame:
     """
     Transforma la lista de ordenes. Cada orden tiene multiples productos
     en una lista - las expandimos para tener una fila por producto.
@@ -122,7 +123,7 @@ def transform_orders(raw_orders: list[dict]) -> pd.DataFrame:
     return df
 
 
-def transform_all(raw_data: dict) -> dict:
+def transform_all(raw_data: Dict) -> Dict:
     """
     Transforma todos los datasets y los retorna como DataFrames limpios.
     """

@@ -15,31 +15,63 @@ load_dotenv(override=True, encoding='utf-8')
 
 def get_engine():
     engine = create_engine(
-        f"postgresql+psycopg://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+        "postgresql+pg8000://",
+        connect_args={
+            "host": os.getenv('DB_HOST'),
+            "port": int(os.getenv('DB_PORT', 5432)),
+            "database": os.getenv('DB_NAME'),
+            "user": os.getenv('DB_USER'),
+            "password": os.getenv('DB_PASSWORD'),
+        }
     )
-    logger.info("Conexión a PostgreSQL establecida")
+    logger.info("Conexion a PostgreSQL establecida")
     return engine
 
 def create_tables(engine):
-    """
-    Crea las tablas en PostgreSQL si no existen.
-    Lee el archivo SQl que definimos arriba.
-    """
-
     logger.info("Creando tablas en PostgreSQL...")
 
-    # Busca el archivo SQL relativo a la raiz del proyecto
-    sql_path = os.path.join(os.path.dirname(__file__), '..', 'sql', 'create_tables.sql')
-
-    with open(sql_path, 'r', encoding='utf-8') as f:
-        sql = f.read()
-
-    with engine.connect() as conn:
+    sql = """
+    CREATE TABLE IF NOT EXISTS products (
+        product_id      INTEGER PRIMARY KEY,
+        title           VARCHAR(255) NOT NULL,
+        price           DECIMAL(10, 2),
+        description     TEXT,
+        category        VARCHAR(100),
+        image           VARCHAR(500),
+        rating_rate     DECIMAL(3, 1),
+        rating_count    INTEGER,
+        loaded_at       TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS users (
+        user_id         INTEGER PRIMARY KEY,
+        email           VARCHAR(255),
+        username        VARCHAR(100),
+        password        VARCHAR(255),
+        first_name      VARCHAR(100),
+        last_name       VARCHAR(100),
+        full_name       VARCHAR(200),
+        city            VARCHAR(100),
+        street          VARCHAR(255),
+        zipcode         VARCHAR(20),
+        geo_lat         DECIMAL(10, 6),
+        geo_long        DECIMAL(10, 6),
+        phone           VARCHAR(50),
+        loaded_at       TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS orders (
+        id              SERIAL PRIMARY KEY,
+        order_id        INTEGER,
+        user_id         INTEGER,
+        order_date      TIMESTAMP,
+        product_id      INTEGER,
+        quantity        INTEGER,
+        loaded_at       TIMESTAMP
+    );
+    """
+    with engine.begin() as conn:
         conn.execute(text(sql))
-        conn.commit()
 
     logger.info("Tablas creadas exitosamente")
-
 
 def load_dataframe(df:pd.DataFrame, table_name:str, engine):
     """
